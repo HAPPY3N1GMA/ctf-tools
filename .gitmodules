@@ -1,0 +1,3 @@
+[submodule "web/miniHTTPCatcher"]
+	path = web/miniHTTPCatcher
+	url = git@github.com:PapaPwn/miniHTTPCatcher.git
