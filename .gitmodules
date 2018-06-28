@@ -1,3 +1,6 @@
 [submodule "web/miniHTTPCatcher"]
 	path = web/miniHTTPCatcher
 	url = git@github.com:PapaPwn/miniHTTPCatcher.git
+[submodule "web/distributed-dns-bruteforcer"]
+	path = web/distributed-dns-bruteforcer
+	url = git@github.com:PapaPwn/distributed-dns-bruteforcer.git
