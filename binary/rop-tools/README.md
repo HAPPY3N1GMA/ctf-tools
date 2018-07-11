@@ -2,8 +2,8 @@
 ## Contents
 - [1. Command cheatsheet](#1-command-cheatsheet)
   * [Find strings in binary](#find-strings-in-binary)
-- [2. Library Documentation (PAPA_ROP)](#2-library-documentation--papa-rop-)
-  * [PAPA_ROP Object](#papa-rop-object)
+- [2. Library Documentation](#2-library-documentation)
+  * [ROP Object](#rop-object)
   * [Payload Generation](#payload-generation)
   * [Process Interaction](#process-interaction)
   * [Misc/Helper Functions](#misc-helper-functions)
@@ -17,8 +17,8 @@
 `rabin2 -z <binary>`
 
 
-### 2. Library Documentation (PAPA_ROP)
-#### PAPA_ROP Object
+### 2. Library Documentation
+#### ROP Object
 ##### \_\_init\_\_(filename)
 Creates a ROP object for the binary with the given `filename`.  
 The `payload` member can be used as a buffer for process interaction.
