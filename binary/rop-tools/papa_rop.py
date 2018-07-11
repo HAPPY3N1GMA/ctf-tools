@@ -13,9 +13,9 @@ class PAPA_ROP:
 
         context.delete_corefiles = True
     
-    ##############################
-    ##### PAYLOAD GENERATION #####
-    ##############################
+    #####################################
+    ##### MANUAL PAYLOAD GENERATION #####
+    #####################################
 
     # Generate padding before overflow
     def get_padding(self):
@@ -37,11 +37,6 @@ class PAPA_ROP:
     def get_string_addr(self, string):
         return list(self.elf.search(string, False))[0]
 
-    # Payload to call system with the given argument
-    def system(self, arg):
-        self.rop.system(arg)
-        return self.rop.chain()
-
     # Pack a value based on the binary architecture
     def p(self, value):
         if (self.arch == "i386"):
@@ -51,6 +46,24 @@ class PAPA_ROP:
         else:
             log.failure("Unknown architecture: " + arch)
             exit(1)
+
+    ########################################
+    ##### AUTOMATED PAYLOAD GENERATION #####
+    ########################################
+
+    # Add to the ROP chain to call system with the given argument
+    def system(self, arg):
+        self.rop.system(arg)
+        return
+
+    # Add to the ROP chain to call a function with the given arguments
+    def call(self, function, args=[]):
+        self.rop.call(function, args)
+        return
+
+    # Get the ROP chain payload
+    def chain(self):
+        return self.rop.chain()
 
     ###############################
     ##### PROCESS INTERACTION #####
@@ -65,6 +78,9 @@ class PAPA_ROP:
 
     def recvline(self):
         return self.process.recvline()
+
+    def recvall(self):
+        return self.process.recvall()
 
     #################################
     ##### MISC/HELPER FUNCTIONS #####
@@ -90,3 +106,4 @@ class PAPA_ROP:
             sub = core.read(core.rsp, 4)
 
         return cyclic_find(sub)
+
