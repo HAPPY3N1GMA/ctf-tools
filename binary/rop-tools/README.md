@@ -2,6 +2,7 @@
 ## Contents
 - [1. Command cheatsheet](#1-command-cheatsheet)
   * [Find strings in binary](#find-strings-in-binary)
+  * [Find ROP gadgets with blacklisted characters](#find-rop-gadgets-with-blacklisted-characters)
 - [2. Library Documentation](#2-library-documentation)
   * [ROP Object](#rop-object)
   * [Manual Payload Generation](#manual-payload-generation)
@@ -16,9 +17,12 @@
     + [x86](#x86)
     + [x64](#x64)
 
+
 ### 1. Command cheatsheet
 #### Find strings in binary
 `rabin2 -z <binary>`
+#### Find ROP gadgets with blacklisted characters
+`ropper -f <binary> -b <bad chars in hex>`
 
 
 ### 2. Library Documentation
@@ -38,13 +42,22 @@ Get the address of the `function` in the binary.
 Get the address of the `string` in the binary.
 ##### p(value)
 Uses p32/p64 to pack `value` depending on the binary architecture.
-##### pop_mov_write(pop, mov, what, where)
+##### pop_mov_write(pop, mov, what, where, reverse=False)
 Writes `what` to `where` using the `pop` and `mov` gadgets.  
 The gadgets are specifically:
 ```
 pop rDST; pop rSRC; ret (pop gadget)
 mov [rDST], rSRC; ret   (mov gadget)
 ```
+The `reverse` parameter implies that rDST and rSRC are not in the same order between the gadgets.
+##### xor_decrypt(pop, xor, cipher_addr, key, reverse=False)
+XOR the bytes at `cipher_addr` with `key` using the `pop` and `xor` gadgets.  
+The gadgets are specifically:
+```
+pop rCIP; pop rKEY; ret      (pop gadget)
+xor byte ptr rCIP, rKEY; ret (xor gadget)
+```
+The `reverse` parameter implies that rCIP and rKEY are not in the same order between the gadgets.
 
 #### Automated Payload Generation
 ##### system(command)
@@ -71,6 +84,9 @@ Allow the user to directly interact with the process
 Turns verbose logging on/off via `status` being set to True/False respectively.
 ##### get_padding_length()
 Returns the number of bytes before overflow occurs.
+##### xor_encode(what, avoid)
+XOR encode `what` to ensure there are no bytes that exist in `avoid`.  
+Returns a (cipher, decrypt_key) tuple that also avoids the bad characters.
 
 
 ### 3. Calling functions examples

