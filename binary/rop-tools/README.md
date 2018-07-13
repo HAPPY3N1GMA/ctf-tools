@@ -29,7 +29,9 @@
 #### ROP Object
 ##### \_\_init\_\_(filename)
 Creates a ROP object for the binary with the given `filename`.  
-The `payload` member can be used as a buffer for process interaction.
+The `payload` member can be used as a buffer for process interaction.  
+The `args` list member are the command line arguments to be run with the process.  
+The `auto_construct_payload` member option determines whether payload construction automatically fills the `payload` member.
 
 #### Manual Payload Generation
 ##### get_padding()
@@ -68,8 +70,11 @@ Add to the ROP chain to call a `function` with the given `args`.
 Get the ROP chain payload
 
 #### Process Interaction
-##### start_process(args=[])
-Starts a process of the binary with `args` optionally specified.
+##### start_process()
+Starts a process of the binary with `self.args` optionally specified.
+##### start_debug(dbg_cmds='continue\n')
+Starts a debug process of the binary with `self.args` optionally specified.  
+The optional `dbg_cmds` parameter specifies any initial debugging commands to be run.
 ##### sendafter(self, delim, payload)
 Wait until `delim` hass been received before sending `payload`.
 ##### recvline()
@@ -78,10 +83,18 @@ Return the next line of output from the process.
 Return all data until EOF is reached.
 ##### interactive()
 Allow the user to directly interact with the process
+##### pwn(prompt='', pwn_type='SHELL')
+Automatically start a process and send `self.payload` after `prompt` has been received.  
+Depedning on the `pwn_type`, one of a few actions can occur:  
+- SHELL = process becomes interactive
+- READ_ALL = all received output is sent back
+- RAD_LINE = a single line of output is sent back
 
 #### Misc/Helper Functions
 ##### log_all(status)
 Turns verbose logging on/off via `status` being set to True/False respectively.
+##### payload_append(payload)
+Append payload component if `self.auto_construct_payload` is set to True.
 ##### get_padding_length()
 Returns the number of bytes before overflow occurs.
 ##### xor_encode(what, avoid)
