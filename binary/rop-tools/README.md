@@ -18,14 +18,14 @@
     + [x64](#x64)
 
 
-### 1. Command cheatsheet
+## 1. Command cheatsheet
 #### Find strings in binary
 `rabin2 -z <binary>`
 #### Find ROP gadgets with blacklisted characters
 `ropper -f <binary> -b <bad chars in hex>`
 
 
-### 2. Library Documentation
+## 2. Library Documentation
 #### ROP Object
 ##### \_\_init\_\_(filename)
 Creates a ROP object for the binary with the given `filename`.  
@@ -88,7 +88,7 @@ Automatically start a process and send `self.payload` after `prompt` has been re
 Depedning on the `pwn_type`, one of a few actions can occur:  
 - SHELL = process becomes interactive
 - READ_ALL = all received output is sent back
-- RAD_LINE = a single line of output is sent back
+- READ_LINE = a single line of output is sent back
 
 #### Misc/Helper Functions
 ##### log_all(status)
@@ -102,7 +102,7 @@ XOR encode `what` to ensure there are no bytes that exist in `avoid`.
 Returns a (cipher, decrypt_key) tuple that also avoids the bad characters.
 
 
-### 3. Calling functions examples
+## 3. Calling functions examples
 #### General
 ##### x86
 ```
