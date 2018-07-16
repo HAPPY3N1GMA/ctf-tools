@@ -1,38 +1,61 @@
 #!/usr/bin/python
 
 import angr
-import claripy
 from pwn import *
 
+# Binary Variables
+BINARY =                # TODO - filename
+INPUT_LENGTH =          # TODO - input number of bytes
+BASE = 0x400000         # TODO - check in IDA (unlikely to change) 
+START_ADDR = BASE +     # TODO - address of instruction to start at
+FIND_ADDR = BASE +      # TODO - address of instruction to try and get to
+AVOID_ADDRS = []        # TODO - address of instructions avoid
 
-BINARY = './crackme'
-INPUT_LENGTH = 80
+# Modify registers and memory (instead of getting stdin to work)
+def read(state):
+    global buf
+    buf = state.regs.rdi   # TODO - register to modify
+    # Let every input character be an unkown value
+    for i in xrange(INPUT_LENGTH):
+        state.mem[buf+i].char = state.se.BVS('c', 8)
+    # Set number of bytes read in as return value
+    state.regs.eax = INPUT_LENGTH
 
-BASE = 0x400000
-START_ADDR = BASE + 0xc6c
+# Setup and run angr
+def main():
+    # Create an angr project
+    log.info('loading binary')
+    p = angr.Project(BINARY, load_options={'auto_load_libs': False})
 
-FIND_ADDR = BASE + 0xe99
-AVOID_ADDR = BASE + 0xe8e
+    # Construct the initial program state
+    log.info('setting up state')
+    state = p.factory.blank_state(addr=START_ADDR)
 
-log.info('loading binary')
-p = angr.Project(BINARY, load_options={'auto_load_libs': False})
+    # TODO - Add any hooks
+    # e.g. Avoid reading from stdin:
+    #       1. Skip past read function
+    #       2. Directly modify the registers via read() above
+    p.hook(BASE+0x274a, hook=read, length=5)
 
-log.info('setting up state')
-state = p.factory.blank_state(addr=START_ADDR)
+    # Construct a simulation manager to perform symbolic execution
+    # and explore to the given address.
+    log.info('exploring')
+    sim = p.factory.simulation_manager(state)
+    sim.explore(find=FIND_ADDR, avoid=AVOID_ADDRS)
 
-magic = claripy.BVS('magic', INPUT_LENGTH * 8)
-state.memory.store(state.regs.rsp - 0x100, magic)
-state.regs.rdi = state.regs.rsp - 0x100
+    # Display results
+    if sim.found:
+        result = sim.found[0].state.se.eval(
+                sim.found[0].state.memory.load(
+                    buf, INPUT_LENGTH), cast_to=str)
+        log.success(result)
+    else:
+        log.error('No path found')
 
-log.info('exploring')
-path = p.factory.path(state)
-path_group = p.factory.path_group(path)
 
-path_group.explore(find=FIND_ADDR, avoid=AVOID_ADDR)
-
-if path_group.found:
-    result = path_group.found[0].state.se.any_str(magic)
-    log.success(result)
-else:
-    log.error('No path found')
+if __name__ == "__main__":
+    before = time.time()
+    main()
+    after = time.time()
+    log.info("Time elapsed: {}".format(after - before))
 
