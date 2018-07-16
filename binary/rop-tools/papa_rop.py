@@ -22,14 +22,10 @@ class PAPA_ROP:
     #####################################
 
     # Generate padding before overflow
-    def get_padding(self):
-        payload = "A"*self.get_padding_length()
+    def get_padding(self, initial=None):
+        payload = "A"*self.get_padding_length(initial)
         self.payload_append(payload)
         return payload
-
-    # Get all the functions of the binary
-    def get_functions(self):
-        return self.elf.functions
 
     # Get the specified function address
     def get_function_addr(self, function):
@@ -38,6 +34,14 @@ class PAPA_ROP:
     # Get the specified symbol address
     def get_symbol_addr(self, symbol):
         return self.elf.symbols[symbol]
+
+    # Get the specified plt entry address
+    def get_plt_addr(self, entry):
+        return self.elf.plt[entry]
+
+    # Get the specified got entry address
+    def get_got_addr(self, entry):
+        return self.elf.got[entry]
 
     # Get the specified string address
     def get_string_addr(self, string):
@@ -145,8 +149,12 @@ class PAPA_ROP:
         self.process = process(self.filename, self.args)
         return
 
-    def start_debug(self, dbg_cmds='continue\n'):
-        self.process = gdb.debug(self.filename + ' '.join(self.args), dbg_cmds)
+    def start_debug(self, breaks=[]):
+        cmds = ""
+        for addr in breaks:
+            cmds += "break *" + hex(addr) + "\n"
+        cmds += "continue\n"
+        self.process = gdb.debug(self.filename + ' '.join(self.args), cmds)
         return
 
     def sendafter(self, delim, payload):
@@ -158,6 +166,9 @@ class PAPA_ROP:
 
     def recvall(self):
         return self.process.recvall()
+    
+    def recvregex(self, regex):
+        return self.process.recvregex(regex)
 
     def interactive(self):
         self.process.interactive()
@@ -194,8 +205,14 @@ class PAPA_ROP:
         return
 
     # Get the number of bytes before overflow occurs
-    def get_padding_length(self):
+    def get_padding_length(self, initial):
         p = process(self.elf.path)
+
+        # Get to overflow input
+        if (initial != None):
+            p.sendline(initial)
+        
+        # Find when the overflow occurs
         p.sendline(cyclic(4096))
         p.wait()
         core = p.corefile

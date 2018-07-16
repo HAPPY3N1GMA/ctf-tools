@@ -34,10 +34,8 @@ The `args` list member are the command line arguments to be run with the process
 The `auto_construct_payload` member option determines whether payload construction automatically fills the `payload` member.
 
 ### Manual Payload Generation
-#### get_padding()
-Generate padding up until overflow occurs.
-#### get_functions()
-Get all the functions in the binary.
+#### get_padding(initial=None)
+Send `initial` input and then generate padding up until overflow occurs.
 #### get_function_addr(function)
 Get the address of the `function` in the binary.
 #### get_string_addr(string)
@@ -72,15 +70,17 @@ Get the ROP chain payload
 ### Process Interaction
 #### start_process()
 Starts a process of the binary with `self.args` optionally specified.
-#### start_debug(dbg_cmds='continue\n')
+#### start_debug(breaks=[])
 Starts a debug process of the binary with `self.args` optionally specified.  
-The optional `dbg_cmds` parameter specifies any initial debugging commands to be run.
+The optional `breaks` list specifies the addresses of any initial breakpoints.
 #### sendafter(self, delim, payload)
 Wait until `delim` hass been received before sending `payload`.
 #### recvline()
 Return the next line of output from the process.
 #### recvall()
 Return all data until EOF is reached.
+#### recvregex(regex)
+Return all data that mataches the provided regex.
 #### interactive()
 Allow the user to directly interact with the process
 #### pwn(prompt='', pwn_type='SHELL')
