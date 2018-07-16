@@ -38,6 +38,12 @@ The `auto_construct_payload` member option determines whether payload constructi
 Send `initial` input and then generate padding up until overflow occurs.
 #### get_function_addr(function)
 Get the address of the `function` in the binary.
+#### get_symbol_addr(symbol)
+Get the address of the `symbol` in the binary.
+#### get_plt_addr(entry)
+Get the address of the plt `entry` in the binary.
+#### get_got_addr(entry)
+Get the address of the got `entry` in the binary.
 #### get_string_addr(string)
 Get the address of the `string` in the binary.
 #### p(value)
