@@ -7,6 +7,8 @@ class PAPA_ROP:
     def __init__(self, filename):
         # Core members
         self.filename = filename
+        self.host = ''
+        self.port = ''
         self.elf = context.binary = ELF(filename)
         self.rop = ROP(self.elf)
         self.arch = self.elf.get_machine_arch()
@@ -149,6 +151,10 @@ class PAPA_ROP:
         self.process = process(self.filename, self.args)
         return
 
+    def start_remote(self):
+        self.process = remote(self.host, self.port)
+        return
+
     def start_debug(self, breaks=[]):
         cmds = ""
         for addr in breaks:
@@ -160,6 +166,13 @@ class PAPA_ROP:
     def sendafter(self, delim, payload):
         self.process.sendafter(delim, payload)
         return
+
+    def sendline(self, payload):
+        self.process.sendline(payload)
+        return
+
+    def recv(self, nbytes):
+        return self.process.recv(nbytes)
 
     def recvline(self):
         return self.process.recvline()

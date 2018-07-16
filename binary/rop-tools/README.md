@@ -76,11 +76,17 @@ Get the ROP chain payload
 ### Process Interaction
 #### start_process()
 Starts a process of the binary with `self.args` optionally specified.
+#### start_remote()
+Starts a remote process with `self.host` on `self.port`.
 #### start_debug(breaks=[])
 Starts a debug process of the binary with `self.args` optionally specified.  
 The optional `breaks` list specifies the addresses of any initial breakpoints.
 #### sendafter(self, delim, payload)
-Wait until `delim` hass been received before sending `payload`.
+Wait until `delim` has been received before sending `payload`.
+#### sendline(self, payload)
+Send `payload` to the current process (new line char is appended).
+#### recv(nbytes)
+Return the next `nbytes` of output from the process.
 #### recvline()
 Return the next line of output from the process.
 #### recvall()
