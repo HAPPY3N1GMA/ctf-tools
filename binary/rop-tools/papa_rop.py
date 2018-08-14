@@ -180,6 +180,9 @@ class PAPA_ROP:
     def recvall(self):
         return self.process.recvall()
     
+    def recvuntil(self, pattern):
+        return self.process.recvuntil(pattern)
+    
     def recvregex(self, regex):
         return self.process.recvregex(regex)
 
