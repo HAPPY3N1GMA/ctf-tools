@@ -16,6 +16,8 @@ class PWN(Disassembler, PAPA_ROP, Format_String, Process, Misc):
         Process.__init__(self, filename)
         Misc.__init__(self, filename)
         context.log_level = 'INFO'
+        context.delete_corefiles = True
+
 
 
 def test_module(argv):

@@ -79,7 +79,7 @@ class Process():
         self.sendline(buf)
         return self.recvall()
 
-    def pwn(self, prompt='', pwn_type='SHELL', process='LOCAL'):
+    def win(self, prompt='', pwn_type='SHELL', process='LOCAL'):
         # Start either local or remote process
         if (process == 'REMOTE'):
             self.start_remote()
@@ -92,7 +92,7 @@ class Process():
         # Send payload
         self.payload = self.payload.rstrip() + '\n'
         self.sendafter(prompt, self.payload)
-        
+
         # Do appropriate following action
         if (pwn_type == 'READ_ALL'):
             return self.recvall()
