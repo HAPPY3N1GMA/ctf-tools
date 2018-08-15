@@ -45,9 +45,9 @@ class PAPA_ROP(Process):
     #   - overflow: function(buffer, *args) -> corefile
     def get_padding_length(self, overflow=None, *args):
         if (overflow == None):
-            core = self.start_and_sendline(cyclic(2048))
-        else:
-            core = overflow(cyclic(2048), *args)
+            overflow = self.start_and_sendline_core
+
+        core = overflow(cyclic(2048), *args)
 
         try:
             sub = p32(core.fault_addr)

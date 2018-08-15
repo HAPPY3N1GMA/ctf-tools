@@ -2,6 +2,7 @@
 import sys
 from disassembler import Disassembler
 from rop import PAPA_ROP
+from format_string import Format_String
 from process import Process
 from misc import Misc
 from pwn import *

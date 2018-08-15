@@ -68,11 +68,16 @@ class Process():
     ##### GENERIC DEFAULT FUNCTIONS #####
     #####################################
 
-    def start_and_sendline(self, buf):
+    def start_and_sendline_core(self, buf):
         self.start_process()
         self.sendline(buf)
         self.wait()
         return self.process.corefile
+
+    def start_and_sendline_line(self, buf):
+        self.start_process()
+        self.sendline(buf)
+        return self.recvall()
 
     def pwn(self, prompt='', pwn_type='SHELL', process='LOCAL'):
         # Start either local or remote process
