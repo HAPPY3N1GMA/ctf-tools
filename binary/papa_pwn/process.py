@@ -30,7 +30,7 @@ class Process():
         for addr in breaks:
             cmds += "break *" + hex(addr) + "\n"
         cmds += "continue\n"
-        self.process = gdb.debug(self.elf.path + ' '.join(self.args), cmds)
+        self.process = gdb.debug(self.elf.path, cmds)
         return
 
     def sendafter(self, delim, payload):
@@ -74,7 +74,7 @@ class Process():
         self.wait()
         return self.process.corefile
 
-    def start_and_sendline_line(self, buf):
+    def start_and_sendline_out(self, buf):
         self.start_process()
         self.sendline(buf)
         return self.recvall()

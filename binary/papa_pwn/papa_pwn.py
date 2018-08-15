@@ -7,11 +7,12 @@ from process import Process
 from misc import Misc
 from pwn import *
 
-class PWN(Disassembler, PAPA_ROP, Process, Misc):
+class PWN(Disassembler, PAPA_ROP, Format_String, Process, Misc):
 
     def __init__(self, filename):
         Disassembler.__init__(self, filename)
         PAPA_ROP.__init__(self, filename)
+        Format_String.__init__(self, filename)
         Process.__init__(self, filename)
         Misc.__init__(self, filename)
         context.log_level = 'INFO'
