@@ -7,7 +7,7 @@ class PAPA_ROP(Process):
 
     def __init__(self, filename):
         Process.__init__(self, filename)
-        context.log_level = 'CRITICAL'
+        #context.log_level = 'CRITICAL'
         context.delete_corefiles = True
         self.elf = context.binary = ELF(filename)
         self.rop = ROP(self.elf)
