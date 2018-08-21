@@ -13,7 +13,7 @@ class Format_String(Process):
         self.rop = ROP(self.elf)
 
         self.debug = True
-        self.max_stack_arg = 8
+        self.max_stack_arg = 1000
 
     ##########################################
     ##### General Format String Exploits #####

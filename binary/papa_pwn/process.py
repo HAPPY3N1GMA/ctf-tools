@@ -17,51 +17,51 @@ class Process():
     ##### Pwntools Wrappers #####
     #############################
 
-    def start_process(self, args=None):
-        self.process = process(self.elf.path, args)
+    def start_process(self, **args):
+        self.process = process(self.elf.path, **args)
         return
 
-    def start_remote(self):
-        self.process = remote(self.host, self.port)
+    def start_remote(self, **args):
+        self.process = remote(self.host, self.port, **args)
         return
 
-    def start_debug(self, breaks=[]):
+    def start_debug(self, breaks=[], **args):
         cmds = ""
         for addr in breaks:
             cmds += "break *" + hex(addr) + "\n"
         cmds += "continue\n"
-        self.process = gdb.debug(self.elf.path, cmds)
+        self.process = gdb.debug(self.elf.path, cmds, **args)
         return
 
-    def sendafter(self, delim, payload):
-        self.process.sendafter(delim, payload)
+    def sendafter(self, delim, payload, **args):
+        self.process.sendafter(delim, payload, **args)
         return
 
-    def sendline(self, payload):
-        self.process.sendline(payload)
+    def sendline(self, payload, **args):
+        self.process.sendline(payload, **args)
         return
 
-    def recv(self, nbytes):
-        return self.process.recv(nbytes)
+    def recv(self, nbytes, **args):
+        return self.process.recv(nbytes, **args)
 
-    def recvline(self):
-        return self.process.recvline()
+    def recvline(self, **args):
+        return self.process.recvline(**args)
 
-    def recvall(self):
-        return self.process.recvall()
+    def recvall(self, **args):
+        return self.process.recvall(**args)
     
-    def recvuntil(self, pattern):
-        return self.process.recvuntil(pattern)
+    def recvuntil(self, pattern, **args):
+        return self.process.recvuntil(pattern, **args)
     
-    def recvregex(self, regex):
-        return self.process.recvregex(regex)
+    def recvregex(self, regex, **args):
+        return self.process.recvregex(regex, **args)
 
-    def interactive(self):
-        self.process.interactive()
+    def interactive(self, **args):
+        self.process.interactive(**args)
         return
 
-    def wait(self):
-        self.process.wait()
+    def wait(self, **args):
+        self.process.wait(**args)
         return
 
     #####################################
